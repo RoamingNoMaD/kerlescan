@@ -183,6 +183,7 @@ def ensure_has_permission(**kwargs):
         or _is_openapi_url(request.path, app_name)
         or check_request_from_drift_service(request=request, logger=logger)
     ):
+        logger.info("allowed request to whitelisted URL")
         return  # allow request
 
     auth_key = get_key_from_headers(request.headers)
@@ -219,17 +220,21 @@ def ensure_has_permission(**kwargs):
             if all_match:
                 found_one = True
         if found_one:
+            logger.info("allowed permitted request")
             return  # allow
+        logger.debug("user does not have access to %s" % kwargs["permissions"])
         raise HTTPError(
             HTTPStatus.FORBIDDEN,
             message="user does not have access to %s" % kwargs["permissions"],
         )
     except RBACDenied:
+        logger.debug("request to retrieve permissions from RBAC was forbidden")
         raise HTTPError(
             HTTPStatus.FORBIDDEN,
             message="request to retrieve permissions from RBAC was forbidden",
         )
     except Timeout:
+        logger.error("request to RBAC timed out")
         raise HTTPError(HTTPStatus.REQUEST_TIMEOUT, message="Request to RBAC timed out")
 
 
@@ -255,22 +260,21 @@ def ensure_entitled(**kwargs):
         or check_request_from_turnpike(request=request, logger=logger)
         or check_service_account_service(request=request, logger=logger)
     ):
+        logger.info("allowed request to whitelisted URL")
         return  # allow request
-
-        # check if the request comes from our own drift service
-        return
 
     auth_key = get_key_from_headers(request.headers)
     if not auth_key:
-        logger.debug("entitlement not found for account/org.")
+        logger.debug("identity not found on request")
         raise HTTPError(HTTPStatus.BAD_REQUEST, message="identity not found on request")
 
     entitlements = json.loads(base64.b64decode(auth_key)).get("entitlements", {})
     if entitlement_key in entitlements:
         if entitlements[entitlement_key].get("is_entitled"):
-            logger.debug("enabled entitlement found on header")
+            logger.info("enabled entitlement found on header")
             return  # allow request
 
+    logger.debug("entitlement not found for account/org.")
     raise HTTPError(HTTPStatus.BAD_REQUEST, message="Entitlement not found for account/org.")
 
 

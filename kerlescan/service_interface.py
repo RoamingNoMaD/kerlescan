@@ -24,21 +24,21 @@ def _validate_service_response(response, logger, auth_header):
     Raise an exception if the response was not what we expected.
     """
     if response.status_code == requests.codes.not_found:
-        logger.info("%s error received from service: %s" % (response.status_code, response.text))
+        logger.error("%s error received from service: %s" % (response.status_code, response.text))
         raise ItemNotReturned(response.text)
 
     if response.status_code in [requests.codes.forbidden, requests.codes.unauthorized]:
-        logger.info("%s error received from service: %s" % (response.status_code, response.text))
+        logger.error("%s error received from service: %s" % (response.status_code, response.text))
         # Log identity header if 401 (unauthorized)
         if response.status_code == requests.codes.unauthorized:
             if isinstance(auth_header, dict) and AUTH_HEADER_NAME in auth_header:
-                logger.info("identity '%s'" % get_key_from_headers(auth_header))
+                logger.error("identity '%s'" % get_key_from_headers(auth_header))
             else:
-                logger.info("no identity or no key")
+                logger.error("no identity or no key")
         raise RBACDenied(response.text)
 
     if response.status_code != requests.codes.ok:
-        logger.warn("%s error received from service: %s" % (response.status_code, response.text))
+        logger.error("%s error received from service: %s" % (response.status_code, response.text))
         raise ServiceError("Error received from backend service")
 
 

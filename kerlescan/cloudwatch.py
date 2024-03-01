@@ -28,7 +28,7 @@ def setup_cw_logging(main_logger, *other_loggers):  # pragma: no cover
         log_group = os.environ.get("CW_LOG_GROUP", "platform-dev")
 
     if not (key_id and secret):
-        main_logger.info("CloudWatch logging disabled due to missing access key")
+        main_logger.warning("CloudWatch logging disabled due to missing access key")
         return
 
     boto3_logs_client = boto3.client(

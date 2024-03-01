@@ -173,7 +173,7 @@ def parse_profile(system_profile, display_name, logger):
             if name != "gpg-pubkey":
                 parsed_profile["installed_packages." + name] = vra
         except UnparsableNEVRAError as e:
-            logger.warn(e.message)
+            logger.warning(e.message)
 
     for package in system_profile.get("installed_packages_delta", []):
         try:
@@ -188,14 +188,14 @@ def parse_profile(system_profile, display_name, logger):
                 else:
                     parsed_profile["installed_packages." + name] = vra
         except UnparsableNEVRAError as e:
-            logger.warn(e.message)
+            logger.warning(e.message)
 
     for interface in system_profile.get("network_interfaces", []):
         try:
             name = interface["name"]
             _parse_interface(name)
         except KeyError:
-            logger.warn("network interface has no name, skipping")
+            logger.warning("network interface has no name, skipping")
             continue
 
     for yum_repo in system_profile.get("yum_repos", []):
@@ -203,7 +203,7 @@ def parse_profile(system_profile, display_name, logger):
             name = yum_repo["name"]
             _parse_yum_repo(name)
         except KeyError:
-            logger.warn("yum repo has no name, skipping")
+            logger.warning("yum repo has no name, skipping")
             continue
 
     return parsed_profile

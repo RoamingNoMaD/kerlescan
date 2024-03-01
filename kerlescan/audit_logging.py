@@ -53,6 +53,6 @@ def audit(self, message, *args, **kws):
         self._log(AUDIT_LEVEL_NUM, audit_message, args, **kws)
 
 
-def setup_audit_logging(logger):
+def setup_audit_logging():
     logging.addLevelName(AUDIT_LEVEL_NUM, AUDIT_LEVEL_NAME)
     logging.Logger.audit = audit
