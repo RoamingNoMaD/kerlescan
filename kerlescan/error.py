@@ -1,8 +1,12 @@
-from flask import current_app, jsonify
+from http.client import responses
+
+from connexion.lifecycle import ConnexionRequest, ConnexionResponse
+from connexion.problem import problem
 
 
-def handle_http_error(error):
-    json_response = jsonify({"message": error.message})
-    response = current_app.make_response(json_response)
-    response.status_code = error.status_code
-    return response
+def handle_http_error(request: ConnexionRequest, error) -> ConnexionResponse:
+    return problem(
+        title=responses[error.status_code],
+        detail=error.message,
+        status=error.status_code,
+    )
