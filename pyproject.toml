@@ -52,6 +52,7 @@ insights-core = "*"
 bitmath = "*"
 app-common-python = "*"
 unleashclient = "*"
+connexion = {version = "^3.0.0"}
 
 
 [tool.poetry.group.dev.dependencies]
